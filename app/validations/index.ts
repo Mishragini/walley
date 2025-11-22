@@ -22,5 +22,18 @@ export const signupSchema = z.object({
     path: ["confirmPassword"],
 })
 
+export const sendMoneySchema = z.object({
+    amount: z.number(),
+    address: z.string()
+})
+
+export const swapSchema = z.object({
+    fromAddress: z.string(),
+    toAddress: z.string(),
+    amount: z.string()
+})
+
 export type signinInputs = z.infer<typeof signinSchema>;
 export type signpInputs = z.infer<typeof signupSchema>;
+export type sendMoneyInputs = z.infer<typeof sendMoneySchema>
+export type swapInputs = z.infer<typeof swapSchema>

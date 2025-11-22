@@ -1,4 +1,5 @@
 
+import { JWT_SECRET_KEY } from "@/lib/config";
 import * as jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 
@@ -10,7 +11,7 @@ interface User {
 
 
 export async function setCookie(payload: User) {
-    const secret_key = process.env.JWT_SECRET_KEY!
+    const secret_key = JWT_SECRET_KEY
 
     const auth_token = jwt.sign(payload, secret_key)
 

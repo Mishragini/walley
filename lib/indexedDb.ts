@@ -2,7 +2,7 @@ import Dexie, { Table } from 'dexie';
 
 export interface Seed {
     id: string;             // required if using as primary key
-    value: Buffer<ArrayBufferLike>;
+    value: string;
 }
 
 export class DB extends Dexie {

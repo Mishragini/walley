@@ -16,6 +16,7 @@ datasource db {
 
 model Account{
   id           String  @id@default(uuid())
+  accountIndex Int     @default(autoincrement())
   userId       String 
   user         User    @relation(fields:[userId],references:[id])
   ethPublicKey String?

@@ -1,15 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { logout } from "../actions/logout";
-
-import { getUserAccounts } from "../actions/wallet";
+import { AccountCard } from "./_components/AccountCard";
+import { AccountProvider } from "./provider";
 
 export default async function Dashboard() {
-  const userAccounts = await getUserAccounts();
-
   return (
-    <div>
-      <div>Dashboard</div>
-      {JSON.stringify(userAccounts)}
-    </div>
+    <AccountProvider>
+      <div className="h-screen flex items-center justify-center ">
+        <div className="border border-accent p-8 rounded-lg bg-primary">
+          <AccountCard />
+        </div>
+      </div>
+    </AccountProvider>
   );
 }
