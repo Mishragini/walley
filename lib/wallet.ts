@@ -4,6 +4,8 @@ import { derivePath } from "ed25519-hd-key";
 import { Wallet } from "ethers";
 import { HDNodeWallet } from "ethers";
 import { db } from "./indexedDb";
+import { toast } from "sonner";
+import { mnemonicToSeedSync } from "bip39";
 
 export async function generateSolanaWallet(derivationPath: string, seed: Buffer<ArrayBufferLike>) {
     const derivedSeed = derivePath(derivationPath, seed.toString("hex")).key;
@@ -22,19 +24,30 @@ export async function generateEthWallet(derivationPath: string, seed: Buffer<Arr
 }
 
 
-export async function getWallet(network: string, accountIndex: number) {
+export async function getWallet(network: string, accountIndex: number, mnemonicPhrase?: string) {
     const { userId } = await getUser();
 
-    const seed = await db.seeds.get({ id: userId });
+    let seed;
 
-    if (!seed) {
-        throw new Error("Seed not found in indexed db");
+    if (!mnemonicPhrase) {
+        const dbSeed = await db.seeds.get({ id: userId });
+
+        if (!dbSeed) {
+            toast.error("Mnemonic seed seems to be missing. Relogin and add back your mneomic phrase")
+            return;
+        }
+
+        seed = dbSeed.value
+    } else {
+        seed = Buffer.from(mnemonicToSeedSync(mnemonicPhrase)).toString("base64");
     }
 
-    const seedBuffer = Buffer.from(seed.value, "base64");
+
+
+    const seedBuffer = Buffer.from(seed, "base64");
 
     if (network === "solana") {
-        const derivationPath = `m/44'/501'/${accountIndex - 1}'/0'`;
+        const derivationPath = `m/44'/501'/${accountIndex}'/0'`;
 
         const keypair = await generateSolanaWallet(
             derivationPath,
@@ -43,7 +56,7 @@ export async function getWallet(network: string, accountIndex: number) {
 
         return keypair
     } else if (network === "ethereum") {
-        const derivationPath = `m/44'/60'/0'/0/${accountIndex - 1}`;
+        const derivationPath = `m/44'/60'/0'/0/${accountIndex}`;
         const wallet = await generateEthWallet(
             derivationPath,
             seedBuffer
@@ -52,6 +65,7 @@ export async function getWallet(network: string, accountIndex: number) {
     }
 
 }
+
 
 
 

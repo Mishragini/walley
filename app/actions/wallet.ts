@@ -12,7 +12,6 @@ export async function addAccount(accountIndex: number, seed: string, selectedNet
 
     const deserializedSeed = Buffer.from(seed, "base64")
 
-
     try {
         if (selectedNetworks.includes("solana")) {
             const derivationPath = `m/44'/501'/${accountIndex}'/0'`;
@@ -26,6 +25,7 @@ export async function addAccount(accountIndex: number, seed: string, selectedNet
         }
         await prisma.account.create({
             data: {
+                accountIndex,
                 ethPublicKey: ethPubKey,
                 solPublicKey: solanaPubkey,
                 user: {

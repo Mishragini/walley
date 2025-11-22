@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useCallback } from "react";
 import { useOnboarding } from "../provider";
 
 export default function StepTwo({
@@ -11,28 +11,34 @@ export default function StepTwo({
 }) {
   const { hasWallet, selectedNetworks, setSelectedNetworks } = useOnboarding();
 
-  function selectNetwork(network: string) {
-    if (selectedNetworks.includes(network)) {
-      const networks = selectedNetworks.filter(
-        (selectedNetwork) => selectedNetwork !== network
-      );
-      setSelectedNetworks(networks);
-    } else {
-      if (hasWallet) {
-        setSelectedNetworks([network]);
+  const selectNetwork = useCallback(
+    (network: string) => {
+      if (selectedNetworks.includes(network)) {
+        const networks = selectedNetworks.filter(
+          (selectedNetwork) => selectedNetwork !== network
+        );
+        setSelectedNetworks(networks);
       } else {
-        setSelectedNetworks([...selectedNetworks, network]);
+        if (hasWallet) {
+          setSelectedNetworks([network]);
+        } else {
+          setSelectedNetworks([...selectedNetworks, network]);
+        }
       }
-    }
-  }
+    },
+    [hasWallet, selectedNetworks, setSelectedNetworks]
+  );
 
   const baseButtonClasses =
     "flex justify-start items-center gap-4 px-4 py-2 w-[200px] h-10 text-lg font-medium hover:pointer";
 
-  const getNetworkButtonClasses = (network: string) =>
-    selectedNetworks.includes(network)
-      ? `${baseButtonClasses} border border-blue-300 bg-blue-500`
-      : baseButtonClasses;
+  const getNetworkButtonClasses = useCallback(
+    (network: string) =>
+      selectedNetworks.includes(network)
+        ? `${baseButtonClasses} border border-blue-300 bg-blue-500`
+        : baseButtonClasses,
+    [selectedNetworks]
+  );
 
   return (
     <div className="flex flex-col h-full pt-10 gap-10">
@@ -62,7 +68,7 @@ export default function StepTwo({
             />
             Ethereum
           </Button>
-
+          {/* 
           <Button
             onClick={() => selectNetwork("bitcoin")}
             className={getNetworkButtonClasses("bitcoin")}
@@ -74,7 +80,7 @@ export default function StepTwo({
               height={32}
             />
             Bitcoin
-          </Button>
+          </Button> */}
         </div>
         <div>
           <Button

@@ -11,7 +11,7 @@ import { db } from "@/lib/indexedDb";
 import { getUser } from "@/app/actions/getUser";
 import { toast } from "sonner";
 import { addAccount } from "@/app/actions/wallet";
-import { useState } from "react";
+import { useCallback, useTransition } from "react";
 
 export function AccountButton() {
   const {
@@ -20,7 +20,7 @@ export function AccountButton() {
     setCurrentAccount,
     refetchUserAccounts,
   } = useAccount();
-  const [addingAccount, setAddingAccount] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   function renderRestAccounts() {
     return (
@@ -38,38 +38,38 @@ export function AccountButton() {
     );
   }
 
-  async function handleAddAccount() {
-    try {
-      setAddingAccount(true);
+  const handleAddAccount = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const { userId } = await getUser();
+        const seed = await db.seeds.get({ id: userId });
+        if (!seed) {
+          toast.error(
+            "Seed not found in indexed db. Login and add back mnemonic phrase."
+          );
+          return;
+        }
 
-      const { userId } = await getUser();
-      const seed = await db.seeds.get({ id: userId });
-      if (!seed) {
-        toast.error("Seed not found in indexed db");
-        return;
+        const base64Seed = seed.value;
+
+        const { error, success } = await addAccount(
+          userAccounts.length + 1,
+          base64Seed,
+          ["solana", "ethereum"]
+        );
+        if (error) {
+          toast.error(error);
+          return;
+        }
+        toast.error("Account added successfully");
+        refetchUserAccounts();
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unable to add account";
+        toast.error(errorMessage);
       }
-
-      const base64Seed = seed.value;
-
-      const { error, success } = await addAccount(
-        userAccounts.length + 1,
-        base64Seed,
-        ["solana", "ethereum"]
-      );
-      if (error) {
-        toast.error(error);
-        return;
-      }
-      toast.error("Account added successfully");
-      setAddingAccount(false);
-      refetchUserAccounts();
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unable to add account";
-      toast.error(errorMessage);
-      setAddingAccount(false);
-    }
-  }
+    });
+  }, [refetchUserAccounts, userAccounts]);
 
   return (
     <Popover>
@@ -81,7 +81,7 @@ export function AccountButton() {
       <PopoverContent className="flex flex-col bg-transparent p-0">
         {userAccounts.length > 0 && renderRestAccounts()}
         <Button
-          disabled={addingAccount}
+          disabled={isPending}
           onClick={handleAddAccount}
           className="rounded-t-none "
           variant={"secondary"}

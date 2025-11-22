@@ -1,5 +1,5 @@
 "use client";
-import { MouseEventHandler, useEffect, useMemo } from "react";
+import { MouseEventHandler, useCallback, useEffect } from "react";
 import { useOnboarding } from "../provider";
 import { Button } from "@/components/ui/button";
 import { generateMnemonic } from "bip39";
@@ -12,23 +12,22 @@ export default function StepThree({
 }: {
   handleClick?: MouseEventHandler<HTMLButtonElement>;
 }) {
-  const {
-    hasWallet,
-    mnemonicLength,
-    setMnemonicLength,
-    mnemonicPhrase,
-    setMnemonicPhrase,
-  } = useOnboarding();
+  const { hasWallet, mnemonicPhrase, setMnemonicPhrase } = useOnboarding();
 
-  const mnemonic = useMemo(() => {
-    return hasWallet
-      ? Array<string>(mnemonicLength).fill("")
-      : generateMnemonic(mnemonicLength === 12 ? 128 : 256).split(" ");
-  }, [mnemonicLength, hasWallet]);
+  const updateMnemonic = useCallback(
+    (mnemonicLength: number) => {
+      const newMnemonic = hasWallet
+        ? Array<string>(mnemonicLength).fill("")
+        : generateMnemonic(mnemonicLength === 12 ? 128 : 256).split(" ");
+
+      setMnemonicPhrase(newMnemonic);
+    },
+    [hasWallet, setMnemonicPhrase]
+  );
 
   useEffect(() => {
-    setMnemonicPhrase(mnemonic);
-  }, [mnemonic, setMnemonicPhrase]);
+    updateMnemonic(12);
+  }, [updateMnemonic]);
 
   const isImportDisabled = mnemonicPhrase.some((word: string) => !word.trim());
 
@@ -45,12 +44,11 @@ export default function StepThree({
         </div>
 
         <div className="flex items-center gap-4">
-          {mnemonicLength === 12 ? (
+          {mnemonicPhrase.length === 12 ? (
             <Button
               className="w-[200px] h-12 text-base hover:cursor-pointer"
               onClick={() => {
-                setMnemonicLength(24);
-                setMnemonicPhrase(Array<string>(24).fill(""));
+                updateMnemonic(24);
               }}
             >
               Use 24 words
@@ -59,8 +57,7 @@ export default function StepThree({
             <Button
               className="w-[200px] h-12 text-base hover:cursor-pointer"
               onClick={() => {
-                setMnemonicLength(12);
-                setMnemonicPhrase(Array<string>(12).fill(""));
+                updateMnemonic(12);
               }}
             >
               Use 12 words
@@ -69,7 +66,6 @@ export default function StepThree({
           {hasWallet ? (
             <Button
               onClick={async () => {
-                //check if the browser supports clipboard api
                 if (!navigator.clipboard || !navigator.clipboard.readText) {
                   toast.error(
                     "Your browser does not support the Clipboard API or readText."
@@ -78,7 +74,6 @@ export default function StepThree({
                 }
                 const phraseString = await navigator.clipboard.readText();
                 const mnemonicArr = phraseString.split(" ");
-                setMnemonicLength(mnemonicArr.length);
                 setMnemonicPhrase(mnemonicArr);
               }}
               className="w-[200px] h-12  hover:bg-blue-700/40 bg-blue-700/20 text-blue-500 text-base hover:cursor-pointer "
@@ -88,7 +83,6 @@ export default function StepThree({
           ) : (
             <Button
               onClick={async () => {
-                //check if the browser supports clipboard api
                 if (!navigator.clipboard || !navigator.clipboard.readText) {
                   toast.error(
                     "Your browser does not support the Clipboard API or readText."
@@ -105,7 +99,6 @@ export default function StepThree({
           )}
         </div>
         <Mnemonic
-          mnemonicLength={mnemonicLength}
           mnemonicPhrase={mnemonicPhrase}
           setUserMnemonic={setMnemonicPhrase}
         />

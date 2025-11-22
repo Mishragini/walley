@@ -13,6 +13,7 @@ export default function StepFive() {
   const { selectedNetworks, mnemonicPhrase } = useOnboarding();
   const walletGenerated = useRef(false);
   const router = useRouter();
+
   useEffect(() => {
     if (walletGenerated.current) return;
     walletGenerated.current = true;
@@ -24,7 +25,7 @@ export default function StepFive() {
         const { userId } = await getUser();
         await db.seeds.put({ id: userId, value: base64Seed });
 
-        const response = await addAccount(0, base64Seed, selectedNetworks);
+        const response = await addAccount(1, base64Seed, selectedNetworks);
         if (response?.error) {
           toast.error(response?.error);
         } else {
@@ -41,7 +42,7 @@ export default function StepFive() {
     }
 
     generateWallet();
-  }, [mnemonicPhrase, selectedNetworks]);
+  }, [mnemonicPhrase, selectedNetworks, router]);
 
   return (
     <div className="h-screen flex items-center justify-center relative">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import StepCircle from "./_components/StepCircle";
 import StepOne from "./_components/StepOne";
 import StepTwo from "./_components/StepTwo";
@@ -16,27 +16,27 @@ export default function OnboardingPage() {
 
   const { setHasWallet, setSelectedNetworks } = useOnboarding();
 
-  function moveToNextStep() {
+  const moveToNextStep = useCallback(() => {
     setCurrentStep((c) => c + 1);
-  }
+  }, []);
 
-  function existingWalletHandler() {
+  const existingWalletHandler = useCallback(() => {
     setHasWallet(true);
     setSelectedNetworks([]);
     moveToNextStep();
-  }
+  }, [setSelectedNetworks, moveToNextStep, setHasWallet]);
 
-  function createWalletHandler() {
+  const createWalletHandler = useCallback(() => {
     setHasWallet(false);
     setSelectedNetworks([]);
     moveToNextStep();
-  }
+  }, [setSelectedNetworks, moveToNextStep, setHasWallet]);
 
-  function moveToPrevStep() {
+  const moveToPrevStep = useCallback(() => {
     setCurrentStep((c) => c - 1);
-  }
+  }, []);
 
-  function renderStep() {
+  const renderStep = useCallback(() => {
     switch (currentStep) {
       case 0:
         return (
@@ -61,7 +61,7 @@ export default function OnboardingPage() {
       default:
         return null;
     }
-  }
+  }, [currentStep, createWalletHandler, existingWalletHandler, moveToNextStep]);
 
   return (
     <div className=" h-screen flex items-center justify-center p-4">

@@ -12,13 +12,13 @@ import { useAccount } from "../provider";
 import { useForm } from "react-hook-form";
 import { sendMoneyInputs, sendMoneySchema } from "@/app/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useState } from "react";
+import { useCallback, useTransition } from "react";
 import { toast } from "sonner";
-import { generateEthWallet, generateSolanaWallet } from "@/lib/wallet";
-import { db } from "@/lib/indexedDb";
-import { getUser } from "@/app/actions/getUser";
+import { getWallet } from "@/lib/wallet";
+
 import {
   Connection,
+  Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
   sendAndConfirmTransaction,
@@ -30,7 +30,6 @@ import { ETH_RPC_ENDPOINT, SOL_RPC_ENDPOINT } from "@/lib/config";
 
 export function Send() {
   const { currentAccount, currentTab } = useAccount();
-  const [sendingMoney, setSendingMoney] = useState(false);
   const {
     register,
     formState: { errors },
@@ -43,80 +42,67 @@ export function Send() {
     },
   });
 
+  const [isPending, startTransaction] = useTransition();
+
   const sendMoney = useCallback(
-    async (values: sendMoneyInputs) => {
-      setSendingMoney(true);
-      try {
-        const accountIndex = currentAccount?.accountIndex;
+    (values: sendMoneyInputs) => {
+      startTransaction(async () => {
+        try {
+          const accountIndex = currentAccount?.accountIndex;
 
-        if (!accountIndex) {
-          throw new Error("Could not find the current account's index");
-        }
+          if (!accountIndex) {
+            throw new Error("Could not find the current account's index");
+          }
 
-        const { userId } = await getUser();
+          const rpcUrl =
+            currentTab === "solana" ? SOL_RPC_ENDPOINT : ETH_RPC_ENDPOINT;
 
-        const seed = await db.seeds.get({ id: userId });
+          if (!rpcUrl) {
+            throw new Error("RPC endpoint not found");
+          }
 
-        if (!seed) {
-          throw new Error("Seed not found in indexed db");
-        }
+          if (currentTab === "solana") {
+            const fromKeypair = (await getWallet(
+              "solana",
+              accountIndex
+            )) as Keypair;
 
-        const seedBuffer = Buffer.from(seed.value, "base64");
+            const connection = new Connection(rpcUrl);
 
-        const rpcUrl =
-          currentTab === "solana" ? SOL_RPC_ENDPOINT : ETH_RPC_ENDPOINT;
+            const transferTransaction = new Transaction().add(
+              SystemProgram.transfer({
+                fromPubkey: fromKeypair.publicKey,
+                toPubkey: new PublicKey(values.address),
+                lamports: values.amount * LAMPORTS_PER_SOL,
+              })
+            );
 
-        if (!rpcUrl) {
-          throw new Error("RPC endpoint not found");
-        }
-
-        if (currentTab === "solana") {
-          const derivationPath = `m/44'/501'/${accountIndex - 1}'/0'`;
-
-          const fromKeypair = await generateSolanaWallet(
-            derivationPath,
-            seedBuffer
+            await sendAndConfirmTransaction(connection, transferTransaction, [
+              fromKeypair,
+            ]);
+          } else if (currentTab === "ethereum") {
+            const wallet = (await getWallet(
+              "ethereum",
+              accountIndex
+            )) as Wallet;
+            const connection = new JsonRpcProvider(rpcUrl);
+            const signer = new Wallet(wallet.privateKey, connection);
+            await signer.sendTransaction({
+              to: values.address,
+              value: parseEther(values.amount.toString()),
+            });
+          }
+          toast.success(
+            `Successfully sent ${values.amount} ${
+              currentTab === "solana" ? "SOL" : "ETH"
+            }to ${values.address}`
           );
-
-          const connection = new Connection(rpcUrl);
-
-          const transferTransaction = new Transaction().add(
-            SystemProgram.transfer({
-              fromPubkey: fromKeypair.publicKey,
-              toPubkey: new PublicKey(values.address),
-              lamports: values.amount * LAMPORTS_PER_SOL,
-            })
-          );
-
-          await sendAndConfirmTransaction(connection, transferTransaction, [
-            fromKeypair,
-          ]);
-          setSendingMoney(false);
-        } else if (currentTab === "ethereum") {
-          const derivationPath = `m/44'/60'/0'/0/${accountIndex - 1}`;
-          const { privateKey } = await generateEthWallet(
-            derivationPath,
-            seedBuffer
-          );
-
-          const connection = new JsonRpcProvider(rpcUrl);
-          const signer = new Wallet(privateKey, connection);
-          await signer.sendTransaction({
-            to: values.address,
-            value: parseEther(values.amount.toString()),
-          });
+        } catch (error) {
+          const error_message =
+            error instanceof Error ? error.message : "Send Failed";
+          toast.error(error_message);
         }
-        toast.success(
-          `Successfully sent ${values.amount} ${
-            currentTab === "solana" ? "SOL" : "ETH"
-          }to ${values.address}`
-        );
-      } catch (error) {
-        const error_message =
-          error instanceof Error ? error.message : "Send Failed";
-        toast.error(error_message);
-        setSendingMoney(false);
-      }
+      });
     },
     [currentAccount, currentTab]
   );
@@ -138,7 +124,7 @@ export function Send() {
         >
           <div className="flex flex-col gap-2">
             <label>{`Enter receiver's ${currentTab} address`}</label>
-            <Input {...register("address")} />
+            <Input {...register("address")} disabled={isPending} />
             {errors.address && errors.address.message}
           </div>
           <div className="flex flex-col gap-2">
@@ -148,6 +134,7 @@ export function Send() {
                 type="number"
                 step="any"
                 {...register("amount", { valueAsNumber: true })}
+                disabled={isPending}
               />
               <div className="absolute top-1/2 -translate-y-1/2 right-0 pr-2">
                 {currentTab === "solana" ? "SOL" : "ETH"}
@@ -156,7 +143,7 @@ export function Send() {
             </div>
           </div>
           <Button
-            disabled={sendingMoney}
+            disabled={isPending}
             className="w-full"
             variant="secondary"
             type="submit"

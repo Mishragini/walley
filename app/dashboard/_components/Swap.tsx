@@ -9,12 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAccount } from "../provider";
-import { ArrowDown, ArrowUp } from "lucide-react";
 import { buildTx, getQuote } from "@/app/actions/swap";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { parseUnits } from "ethers";
@@ -115,7 +113,7 @@ export function Swap() {
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="secondary" size="lg">
           Swap
         </Button>

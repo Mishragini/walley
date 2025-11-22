@@ -1,14 +1,16 @@
 "use client";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useAccount } from "../provider";
 import { toast } from "sonner";
 import { ethers } from "ethers";
 import { ETH_RPC_ENDPOINT, SOL_RPC_ENDPOINT } from "@/lib/config";
+import { Spinner } from "@/app/_components/Spinner";
 
 export function Balance() {
   const { currentAccount, currentTab } = useAccount();
   const [balance, setBalance] = useState<number | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     async function getBalance() {
@@ -38,8 +40,6 @@ export function Balance() {
         setBalance(solBalance);
       }
       if (currentTab === "ethereum") {
-        //fetch ethereum balance
-
         if (!rpcUrl) {
           throw new Error("RPC endpoint not found");
         }
@@ -60,9 +60,18 @@ export function Balance() {
         setBalance(balanceEth);
       }
     }
-
-    getBalance();
+    startTransition(() => {
+      getBalance();
+    });
   }, [currentAccount, currentTab]);
+
+  if (isPending) {
+    return (
+      <div className="h-40">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center gap-2 text-3xl p-8 font-semibold">

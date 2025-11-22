@@ -10,6 +10,14 @@ export const signinSchema = z.object({
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
             "Password must contain uppercase, lowercase, number, and special character"
         ),
+    mnemonic: z.string().optional().refine((val) => {
+        if (!val) return true;
+        const trimmedVal = val?.trim()
+
+        if (!trimmedVal) return;
+        const array = trimmedVal?.split(" ")
+        return array.length === 24 || array.length === 12
+    })
 });
 
 export const signupSchema = z.object({
@@ -34,6 +42,6 @@ export const swapSchema = z.object({
 })
 
 export type signinInputs = z.infer<typeof signinSchema>;
-export type signpInputs = z.infer<typeof signupSchema>;
+export type signupInputs = z.infer<typeof signupSchema>;
 export type sendMoneyInputs = z.infer<typeof sendMoneySchema>
 export type swapInputs = z.infer<typeof swapSchema>

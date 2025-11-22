@@ -1,13 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { useOnboarding } from "../provider";
-import { useState } from "react";
 
 export default function Mnemonic({
-  mnemonicLength,
   mnemonicPhrase,
   setUserMnemonic,
 }: {
-  mnemonicLength: number;
   mnemonicPhrase: string[];
   setUserMnemonic: React.Dispatch<React.SetStateAction<string[]>>;
 }) {

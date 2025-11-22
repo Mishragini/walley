@@ -7,8 +7,10 @@ import {
   useEffect,
   useRef,
   useState,
+  useTransition,
 } from "react";
 import { toast } from "sonner";
+import { Spinner } from "../_components/Spinner";
 
 interface AccountData {
   id: string;
@@ -37,6 +39,8 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const currentAccountInitialised = useRef(false);
   const [currentTab, setCurrentTab] = useState<"solana" | "ethereum">("solana");
 
+  const [isPending, startTransition] = useTransition();
+
   const refetchUserAccounts = useCallback(async () => {
     const { error, userAccounts } = await getUserAccounts();
     if (error || !userAccounts) {
@@ -59,10 +63,17 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         setCurrentAccount(userAccounts[0]);
       }
     }
-    fetchUserAccounts();
+    startTransition(() => {
+      fetchUserAccounts();
+    });
   }, [refetchUserAccounts]);
-  if (!accounts || accounts.length === 0) {
-    return <div>Loading..</div>;
+
+  if (isPending) {
+    return (
+      <div className="h-screen">
+        <Spinner />
+      </div>
+    );
   }
   return (
     <AccountContext.Provider
