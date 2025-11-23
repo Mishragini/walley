@@ -28,6 +28,7 @@ export default function StepFive() {
         const response = await addAccount(base64Seed, selectedNetworks, 1);
         if (response?.error) {
           toast.error(response?.error);
+          return;
         } else {
           toast.success(response.success);
           router.push("/dashboard");

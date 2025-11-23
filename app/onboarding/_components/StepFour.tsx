@@ -39,6 +39,7 @@ export default function StepFour({ handleClick }: { handleClick: () => void }) {
         const result = await signup(email, password);
         if (result.error) {
           toast.error(result.error);
+          return;
         }
         handleClick();
       });
