@@ -49,6 +49,7 @@ export default function StepTwo({
       <div className="flex flex-col h-full justify-between py-8">
         <div className="grid grid-cols-2 gap-x-8 gap-y-4">
           <Button
+            variant="secondary"
             onClick={() => selectNetwork("solana")}
             className={getNetworkButtonClasses("solana")}
           >
@@ -57,6 +58,7 @@ export default function StepTwo({
           </Button>
 
           <Button
+            variant="secondary"
             onClick={() => selectNetwork("ethereum")}
             className={getNetworkButtonClasses("ethereum")}
           >
@@ -86,7 +88,6 @@ export default function StepTwo({
           <Button
             disabled={selectedNetworks.length === 0}
             onClick={handleClick}
-            variant="secondary"
             className="h-12 w-md text-base font-semibold"
           >
             {selectedNetworks.length === 0

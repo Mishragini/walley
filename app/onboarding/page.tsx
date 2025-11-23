@@ -65,14 +65,14 @@ export default function OnboardingPage() {
 
   return (
     <div className=" h-screen flex items-center justify-center p-4">
-      <div className=" flex flex-col h-full items-start ">
+      <div className=" flex flex-col h-full items-start w-md">
         <div className=" flex items-center pt-20 relative justify-start w-full">
           {currentStep !== 0 && currentStep !== 4 && (
             <ArrowLeft
               onClick={moveToPrevStep}
               height={28}
               width={28}
-              className="  text-[#969FAF] hover:pointer"
+              className="  text-muted-foreground hover:pointer"
             />
           )}
 

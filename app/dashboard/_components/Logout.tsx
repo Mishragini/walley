@@ -15,7 +15,6 @@ export function Logout() {
       <Button
         disabled={isPending}
         onClick={handleLogut}
-        variant="secondary"
         className="rounded-full"
         size="sm"
       >

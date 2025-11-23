@@ -5,7 +5,7 @@ export default async function Dashboard() {
   return (
     <AccountProvider>
       <div className="h-screen flex items-center justify-center ">
-        <div className="border border-accent p-8 rounded-lg bg-primary">
+        <div className="border border-border p-8 rounded-lg bg-card">
           <AccountCard />
         </div>
       </div>

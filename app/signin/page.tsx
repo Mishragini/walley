@@ -71,74 +71,80 @@ export default function SignIn() {
   );
 
   return (
-    <div className="h-screen w-full flex flex-col items-center justify-center gap-10">
-      <div className="flex flex-col gap-4 items-center">
-        <Logo />
-        <div className="text-2xl font-medium">Login in to your wallet</div>
-        <p className="text-muted-foreground">
-          {"Don't have an account? "}
-          <Link className="hover:pointer underline" href={"/onboarding"}>
-            Start Onboarding
-          </Link>
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
-        <div className="flex flex-col gap-2">
-          <label className="text-[#969FAF] font-medium text-base">Email</label>
-          <Input {...register("email")} type="text" disabled={isPending} />
-          {errors.email && (
-            <p className="text-red-500 font-medium text-base">
-              {errors.email.message}
-            </p>
-          )}
+    <div className="h-screen w-full flex flex-col items-center justify-center ">
+      <div className="w-md flex flex-col gap-10">
+        <div className="flex flex-col gap-4 items-center">
+          <Logo />
+          <div className="text-2xl font-medium">Login in to your wallet</div>
+          <p className="text-muted-foreground">
+            {"Don't have an account? "}
+            <Link className="hover:pointer underline" href={"/onboarding"}>
+              Start Onboarding
+            </Link>
+          </p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-[#969FAF] font-medium text-base">
-            Password
-          </label>
-          <PasswordInput
-            register={register}
-            setEyeState={setShowPassword}
-            eyeState={showPassword}
-            isPending={isPending}
-            fieldName="password"
-          />
-
-          {errors.password && (
-            <p className="text-red-500 font-medium text-base">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {showMnemonicField && (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-8 max-w-md"
+        >
           <div className="flex flex-col gap-2">
-            <label>Add Mnemonic</label>
-            <Textarea
-              {...register("mnemonic")}
-              className="max-w-md"
-              placeholder="Add your 12/24 word Mnemonic Phrase"
-            />
-            {errors.mnemonic && (
-              <p className="text-red-500 font-medium text-base">
-                {errors.mnemonic.message}
+            <label className="text-muted-foreground font-medium text-base">
+              Email
+            </label>
+            <Input {...register("email")} type="text" disabled={isPending} />
+            {errors.email && (
+              <p className="text-destructive font-medium text-base">
+                {errors.email.message}
               </p>
             )}
           </div>
-        )}
 
-        <Button
-          type="submit"
-          variant="secondary"
-          size="lg"
-          className="w-md text-base font-semibold"
-          disabled={isPending}
-        >
-          {isPending ? "Signing in..." : "Sign In"}
-        </Button>
-      </form>
+          <div className="flex flex-col gap-2">
+            <label className="text-muted-foreground font-medium text-base">
+              Password
+            </label>
+            <PasswordInput
+              register={register}
+              setEyeState={setShowPassword}
+              eyeState={showPassword}
+              isPending={isPending}
+              fieldName="password"
+            />
+
+            {errors.password && (
+              <p className="text-destructive font-medium text-base">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {showMnemonicField && (
+            <div className="flex flex-col gap-2">
+              <label>Add Mnemonic</label>
+              <Textarea
+                {...register("mnemonic")}
+                className="max-w-md"
+                placeholder="Add your 12/24 word Mnemonic Phrase"
+              />
+              {errors.mnemonic && (
+                <p className="text-destructive font-medium text-base">
+                  {errors.mnemonic.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            className="w-md text-base font-semibold"
+            disabled={isPending}
+          >
+            {isPending ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

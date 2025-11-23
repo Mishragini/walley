@@ -47,28 +47,30 @@ export default function StepFour({ handleClick }: { handleClick: () => void }) {
   );
 
   return (
-    <div className="h-full flex flex-col items-center gap-8 pt-10">
+    <div className="h-full flex flex-col items-center gap-8 pt-10 w-full">
       <div className="flex flex-col items-center gap-2">
         <div className="text-2xl font-medium">Set up your account</div>
-        <p className="text-[#969FAF] font-medium text-base text-center">
+        <p className="text-muted-foreground font-medium text-base text-center">
           You&apos;ll use these details to log in to your wallet.
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit(handleSignUp)}
-        className="flex flex-col gap-6 w-full max-w-md"
+        className="flex flex-col gap-6 w-full"
       >
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-[#E5E7EB]">Email</label>
+          <label className="text-sm font-medium text-foreground">Email</label>
           <Input {...register("email")} className="h-11" disabled={isPending} />
           {errors.email?.message && (
-            <p className="text-xs text-red-500">{errors.email?.message}</p>
+            <p className="text-xs text-destructive">{errors.email?.message}</p>
           )}
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-[#E5E7EB]">Password</label>
+          <label className="text-sm font-medium text-foreground">
+            Password
+          </label>
           <PasswordInput
             register={register}
             setEyeState={setShowPassword}
@@ -77,12 +79,14 @@ export default function StepFour({ handleClick }: { handleClick: () => void }) {
             fieldName="password"
           />
           {errors?.password?.message && (
-            <p className="text-xs text-red-500">{errors.password?.message}</p>
+            <p className="text-xs text-destructive">
+              {errors.password?.message}
+            </p>
           )}
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-[#E5E7EB]">
+          <label className="text-sm font-medium text-foreground">
             Confirm Password
           </label>
           <PasswordInput
@@ -94,7 +98,7 @@ export default function StepFour({ handleClick }: { handleClick: () => void }) {
           />
 
           {errors?.confirmPassword?.message && (
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-destructive">
               {errors.confirmPassword?.message}
             </p>
           )}
@@ -103,7 +107,6 @@ export default function StepFour({ handleClick }: { handleClick: () => void }) {
         <div className="pt-2">
           <Button
             type="submit"
-            variant="secondary"
             className="h-12 w-full text-base font-semibold hover:pointer"
             disabled={!isValid || isPending}
           >

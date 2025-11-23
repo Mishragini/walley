@@ -105,7 +105,7 @@ export function Swap() {
           Swap
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-foreground h-1/2">
+      <DialogContent className="bg-background h-1/2">
         <DialogHeader>
           <DialogTitle>Swap tokens cross chain</DialogTitle>
         </DialogHeader>

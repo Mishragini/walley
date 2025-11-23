@@ -25,7 +25,7 @@ export default function StepFive() {
         const { userId } = await getUser();
         await db.seeds.put({ id: userId, value: base64Seed });
 
-        const response = await addAccount(1, base64Seed, selectedNetworks);
+        const response = await addAccount(base64Seed, selectedNetworks, 1);
         if (response?.error) {
           toast.error(response?.error);
         } else {
@@ -45,7 +45,7 @@ export default function StepFive() {
   }, [mnemonicPhrase, selectedNetworks, router]);
 
   return (
-    <div className="h-screen flex items-center justify-center relative">
+    <div className="h-screen flex items-center justify-center relative w-full">
       <div className="absolute w-[300px] h-[300px] rounded-full border-4 border-blue-500 border-t-transparent animate-spin top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
       <div className="text-lg font-medium">Setting up your wallet</div>
     </div>

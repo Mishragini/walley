@@ -1,9 +1,5 @@
 import Dexie, { Table } from 'dexie';
-
-export interface Seed {
-    id: string;             // required if using as primary key
-    value: string;
-}
+import { Seed } from './type';
 
 export class DB extends Dexie {
     seeds!: Table<Seed>;

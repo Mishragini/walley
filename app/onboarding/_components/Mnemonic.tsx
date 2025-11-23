@@ -19,12 +19,12 @@ export default function Mnemonic({
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
       {mnemonicPhrase.map((word, index) => (
         <div
-          className="flex bg-primary pl-2 rounded-lg items-center "
+          className="flex bg-secondary text-secondary-foreground pl-2 rounded-lg items-center "
           key={index}
         >
           <p>{index + 1}</p>
           <Input
-            className="w-40  h-10 text-primary-foreground border-none focus-visible:ring-0 focus-visible:border-transparent "
+            className="w-40 h-10  dark:bg-transparent border-none focus-visible:ring-0 focus-visible:border-transparent "
             value={word}
             disabled={!hasWallet}
             onChange={(e) => {

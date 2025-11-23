@@ -114,7 +114,7 @@ export function Send() {
           Send
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-foreground h-1/2 flex flex-col items-center justify-center">
+      <DialogContent className="bg-background h-1/2 flex flex-col items-center justify-center">
         <DialogHeader>
           <DialogTitle className="hidden">Send</DialogTitle>
         </DialogHeader>
@@ -142,12 +142,7 @@ export function Send() {
               {errors.amount && errors.amount.message}
             </div>
           </div>
-          <Button
-            disabled={isPending}
-            className="w-full"
-            variant="secondary"
-            type="submit"
-          >
+          <Button disabled={isPending} className="w-full" type="submit">
             Send
           </Button>
         </form>

@@ -46,6 +46,7 @@ export default function StepThree({
         <div className="flex items-center gap-4">
           {mnemonicPhrase.length === 12 ? (
             <Button
+              variant="secondary"
               className="w-[200px] h-12 text-base hover:cursor-pointer"
               onClick={() => {
                 updateMnemonic(24);
@@ -55,6 +56,7 @@ export default function StepThree({
             </Button>
           ) : (
             <Button
+              variant="secondary"
               className="w-[200px] h-12 text-base hover:cursor-pointer"
               onClick={() => {
                 updateMnemonic(12);
@@ -106,7 +108,6 @@ export default function StepThree({
 
       <Button
         onClick={handleClick}
-        variant="secondary"
         className="h-12 w-md text-base font-semibold hover:pointer"
         disabled={isImportDisabled}
       >

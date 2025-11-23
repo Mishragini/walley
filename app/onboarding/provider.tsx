@@ -1,13 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-
-type OnboardingProviderValues = {
-  hasWallet: boolean;
-  setHasWallet: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedNetworks: string[];
-  setSelectedNetworks: React.Dispatch<React.SetStateAction<string[]>>;
-  mnemonicPhrase: string[];
-  setMnemonicPhrase: React.Dispatch<React.SetStateAction<string[]>>;
-};
+import { OnboardingProviderValues } from "@/lib/type";
 
 const OnboardingContext = createContext<OnboardingProviderValues | null>(null);
 

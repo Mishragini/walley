@@ -2,12 +2,7 @@
 import { JWT_SECRET_KEY } from "@/lib/config";
 import * as jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
-
-interface User {
-    email: string;
-    password: string;
-    id: string;
-}
+import { User } from "@/lib/type";
 
 
 export async function setCookie(payload: User) {

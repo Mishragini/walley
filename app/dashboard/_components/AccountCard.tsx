@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { AccountButton } from "./AccountButton";
 import { Balance } from "./Balance";
 import { NetworkTabs } from "./NetworkTabs";
@@ -13,7 +12,6 @@ export function AccountCard() {
       <Logout />
       <AccountButton />
       <NetworkTabs />
-      <Balance />
       <div className="flex items-center justify-between gap-2">
         <Send />
         <Receive />

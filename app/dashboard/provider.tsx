@@ -11,33 +11,17 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../_components/Spinner";
-
-interface AccountData {
-  id: string;
-  userId: string;
-  ethPublicKey: string | null;
-  solPublicKey: string | null;
-  accountIndex: number;
-}
-
-interface AccountContextValues {
-  userAccounts: AccountData[];
-  currentAccount: AccountData | null;
-  setCurrentAccount: React.Dispatch<React.SetStateAction<AccountData | null>>;
-  refetchUserAccounts: () => Promise<AccountData[]>;
-  currentTab: "solana" | "ethereum";
-  setCurrentTab: React.Dispatch<React.SetStateAction<"solana" | "ethereum">>;
-}
+import { AccountData, AccountContextValues, Network } from "@/lib/type";
 
 const AccountContext = createContext<AccountContextValues | null>(null);
 
 export function AccountProvider({ children }: { children: React.ReactNode }) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
-  const [currentAccount, setCurrentAccount] = useState<AccountData | null>(
-    null
+  const [currentAccount, setCurrentAccount] = useState<AccountData | undefined>(
+    undefined
   );
   const currentAccountInitialised = useRef(false);
-  const [currentTab, setCurrentTab] = useState<"solana" | "ethereum">("solana");
+  const [currentTab, setCurrentTab] = useState<Network>("solana");
 
   const [isPending, startTransition] = useTransition();
 
@@ -68,7 +52,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     });
   }, [refetchUserAccounts]);
 
-  if (isPending) {
+  if (isPending || !currentAccount) {
     return (
       <div className="h-screen">
         <Spinner />

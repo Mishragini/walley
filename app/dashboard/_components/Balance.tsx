@@ -2,24 +2,24 @@
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { useEffect, useState, useTransition } from "react";
 import { useAccount } from "../provider";
-import { toast } from "sonner";
 import { ethers } from "ethers";
 import { ETH_RPC_ENDPOINT, SOL_RPC_ENDPOINT } from "@/lib/config";
 import { Spinner } from "@/app/_components/Spinner";
+import { AddAccount } from "@/app/_components/AddAccount";
+import { Network } from "@/lib/type";
 
-export function Balance() {
-  const { currentAccount, currentTab } = useAccount();
+export function Balance({ network }: { network: Network }) {
+  const { currentAccount } = useAccount();
   const [balance, setBalance] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
-
+  const [showAddAccount, setShowAddAccount] = useState(false);
   useEffect(() => {
     async function getBalance() {
-      const rpcUrl =
-        currentTab === "solana" ? SOL_RPC_ENDPOINT : ETH_RPC_ENDPOINT;
+      const rpcUrl = network === "solana" ? SOL_RPC_ENDPOINT : ETH_RPC_ENDPOINT;
       if (!rpcUrl) {
         throw new Error("RPC endpoint not found");
       }
-      if (currentTab === "solana") {
+      if (network === "solana") {
         //fetch solana balance
 
         const connection = new Connection(rpcUrl);
@@ -27,9 +27,12 @@ export function Balance() {
         const solPublicKey = currentAccount?.solPublicKey;
 
         if (!solPublicKey) {
-          toast.error("Could not find solana public key for current account");
+          setShowAddAccount(true);
           return;
         }
+
+        // Reset showAddAccount if public key exists
+        setShowAddAccount(false);
 
         const address = new PublicKey(solPublicKey);
 
@@ -37,7 +40,7 @@ export function Balance() {
         const solBalance = lamportsBalance / LAMPORTS_PER_SOL;
         setBalance(solBalance);
       }
-      if (currentTab === "ethereum") {
+      if (network === "ethereum") {
         if (!rpcUrl) {
           throw new Error("RPC endpoint not found");
         }
@@ -47,9 +50,11 @@ export function Balance() {
         const address = currentAccount?.ethPublicKey;
 
         if (!address) {
-          toast.error("Could not find ethereum public key for current account");
+          setShowAddAccount(true);
           return;
         }
+
+        setShowAddAccount(false);
 
         const balanceWei = await provider.getBalance(address);
         const balanceEth = parseFloat(ethers.formatEther(balanceWei));
@@ -59,7 +64,7 @@ export function Balance() {
     startTransition(() => {
       getBalance();
     });
-  }, [currentAccount, currentTab]);
+  }, [currentAccount, network]);
 
   if (isPending) {
     return (
@@ -69,10 +74,17 @@ export function Balance() {
     );
   }
 
+  if (showAddAccount) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <AddAccount networks={[network]} current={true} />
+      </div>
+    );
+  }
   return (
     <div className="flex items-center justify-center gap-2 text-3xl p-8 font-semibold">
       <div>{balance}</div>
-      <div>{currentTab === "solana" ? "SOL" : "ETH"}</div>
+      <div>{network === "solana" ? "SOL" : "ETH"}</div>
     </div>
   );
 }
