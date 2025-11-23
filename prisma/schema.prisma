@@ -16,7 +16,7 @@ datasource db {
 
 model Account{
   id           String  @id@default(uuid())
-  accountIndex Int     @unique
+  accountIndex Int     
   userId       String 
   user         User    @relation(fields:[userId],references:[id])
   ethPublicKey String?

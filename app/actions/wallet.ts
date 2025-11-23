@@ -30,26 +30,37 @@ export async function addAccount(seed: string, selectedNetworks: string[], accou
             const wallet = await generateEthWallet(derivationPath, deserializedSeed);
             ethPubKey = wallet.address
         }
-        await prisma.account.upsert({
+        const existingAccount = await prisma.account.findFirst({
             where: {
                 accountIndex: index,
                 userId
-            },
-            create: {
-                accountIndex: index,
-                ethPublicKey: ethPubKey,
-                solPublicKey: solanaPubkey,
-                user: {
-                    connect: {
-                        id: userId
-                    }
-                }
-            },
-            update: {
-                ethPublicKey: ethPubKey,
-                solPublicKey: solanaPubkey,
             }
         })
+
+        if (existingAccount) {
+            await prisma.account.update({
+                where: {
+                    id: existingAccount.id
+                },
+                data: {
+                    ethPublicKey: ethPubKey,
+                    solPublicKey: solanaPubkey,
+                }
+            })
+        } else {
+            await prisma.account.create({
+                data: {
+                    accountIndex: index,
+                    ethPublicKey: ethPubKey,
+                    solPublicKey: solanaPubkey,
+                    user: {
+                        connect: {
+                            id: userId
+                        }
+                    }
+                }
+            })
+        }
         revalidatePath("/dashboard")
         return { success: "Account added" }
 
