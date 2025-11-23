@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/indexedDb";
 import { mnemonicToSeedSync } from "bip39";
+import { ETH_RPC_ENDPOINT } from "@/lib/config";
 
 export default function SignIn() {
   const {
@@ -32,30 +33,38 @@ export default function SignIn() {
   const onSubmit = useCallback(
     async (values: signinInputs) => {
       startTransition(async () => {
-        const res = await signIn(values);
+        try {
+          const res = await signIn(values);
 
-        if (res.error) {
-          toast.error(res.error);
-          return;
-        }
-        if (res.userId) {
-          if (values.mnemonic) {
-            const seed = Buffer.from(
-              mnemonicToSeedSync(values.mnemonic)
-            ).toString("base64");
-
-            await db.seeds.put({ id: res.userId, value: seed });
-          }
-          const seed = await db.seeds.get({ id: res.userId });
-
-          if (!seed || !seed.value) {
-            setShowMnemonicField(true);
-            toast.error("Seed not found. Kindly add the seed.");
+          if (res.error) {
+            toast.error(res.error);
             return;
           }
+          if (res.userId) {
+            if (values.mnemonic) {
+              const seed = Buffer.from(
+                mnemonicToSeedSync(values.mnemonic)
+              ).toString("base64");
+
+              await db.seeds.put({ id: res.userId, value: seed });
+            }
+            const seed = await db.seeds.get({ id: res.userId });
+
+            if (!seed || !seed.value) {
+              setShowMnemonicField(true);
+              toast.error("Seed not found. Kindly add the seed.");
+              return;
+            }
+          }
+          toast.success("Signed in successfully!");
+          router.push("/dashboard");
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Something went wrong while signing up!";
+          toast.error(errorMessage);
         }
-        toast.success("Signed in successfully!");
-        router.push("/dashboard");
       });
     },
     [router]

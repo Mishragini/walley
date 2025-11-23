@@ -43,7 +43,6 @@ export async function swapEthTxn(tx: txDataEth, accountIndex: number) {
     const signer = new Wallet(wallet.privateKey, connection)
     const addr = await signer.getAddress();
     const bal = await connection.getBalance(addr);
-    console.log("addr and balance...", addr, bal)
 
     const response = await signer.sendTransaction(tx)
 
@@ -55,11 +54,10 @@ export async function swapSolTxn(tx: txDataSol, accountIndex: number) {
     const keypair = await getWallet("solana", accountIndex) as Keypair;
 
     const rpcUrl = SOL_RPC_ENDPOINT;
-    if (!rpcUrl) throw new Error("❌ No Solana RPC URL found");
+    if (!rpcUrl) throw new Error(" No Solana RPC URL found");
 
     const connection = new Connection(rpcUrl);
 
-    console.log("🔵 Incoming Solana txData:", tx);
 
     // --------------------------------------------------------
     // 1. BUILD INSTRUCTIONS SAFELY
@@ -98,7 +96,6 @@ export async function swapSolTxn(tx: txDataSol, accountIndex: number) {
 
     const lutAccounts: AddressLookupTableAccount[] = lookupTables.filter(Boolean);
 
-    console.log("🔵 Loaded Lookup Tables:", lutAccounts.length);
 
     const { blockhash, lastValidBlockHeight } =
         await connection.getLatestBlockhash("finalized");
@@ -135,9 +132,8 @@ export async function swapSolTxn(tx: txDataSol, accountIndex: number) {
     );
 
     if (confirmation.value.err) {
-        throw new Error(`❌ Solana transaction failed: ${confirmation.value.err}`);
+        throw new Error(` Solana transaction failed: ${confirmation.value.err}`);
     }
 
-    console.log("✅ Solana Swap TX Signature:", signature);
     return signature;
 }

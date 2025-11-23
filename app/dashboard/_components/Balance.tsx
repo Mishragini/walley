@@ -34,9 +34,7 @@ export function Balance() {
         const address = new PublicKey(solPublicKey);
 
         const lamportsBalance = await connection.getBalance(address);
-        console.log(lamportsBalance);
         const solBalance = lamportsBalance / LAMPORTS_PER_SOL;
-        console.log(solBalance);
         setBalance(solBalance);
       }
       if (currentTab === "ethereum") {
@@ -54,9 +52,7 @@ export function Balance() {
         }
 
         const balanceWei = await provider.getBalance(address);
-        console.log(balanceWei);
         const balanceEth = parseFloat(ethers.formatEther(balanceWei));
-        console.log(balanceEth);
         setBalance(balanceEth);
       }
     }

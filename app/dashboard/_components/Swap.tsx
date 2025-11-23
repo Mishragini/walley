@@ -45,7 +45,6 @@ export function Swap() {
 
   const convertAmount = useCallback(
     (amount: string) => {
-      console.log("fiuefiuei");
       const amountInDecimals = parseFloat(amount);
 
       if (from === "solana") {
@@ -53,7 +52,6 @@ export function Swap() {
         return (amountInDecimals * LAMPORTS_PER_SOL).toString();
       } else {
         // parseUnits returns bigint → convert to string
-        console.log("jsdfiousiu");
         return parseUnits(amount, "ether").toString();
       }
     },
@@ -64,10 +62,8 @@ export function Swap() {
       try {
         const { fromAddress, toAddress, amount } = values;
         const to = from === "solana" ? "ethereum" : "solana";
-        console.log("difuoierufoi");
         const inputQuoteAmount = convertAmount(amount);
-        console.log("dfcvueroifuoiegjhg");
-        console.log("inputAmount......", inputQuoteAmount);
+
         if (!currentAccount) {
           return;
         }
@@ -82,29 +78,20 @@ export function Swap() {
 
         const quoteId = quoteResponse.manualRoutes[0].quoteId;
 
-        console.log("quoteId...", quoteId);
-
         const builTxRes = await buildTx(quoteId);
-
-        console.log("buildTxrES.....", builTxRes);
 
         const { txData } = builTxRes;
 
-        console.log("txData", txData);
-
         if (from === "ethereum") {
-          const txnRes = await swapEthTxn(txData, currentAccount?.accountIndex);
-          console.log("txnRes", txnRes);
+          await swapEthTxn(txData, currentAccount?.accountIndex);
         } else if (from === "solana") {
-          const txnRes = await swapSolTxn(txData, currentAccount?.accountIndex);
-          console.log("txnRes", txnRes);
+          await swapSolTxn(txData, currentAccount?.accountIndex);
         }
       } catch (error) {
         const errorMessage =
           error instanceof Error
             ? error.message
             : "Something went wrong while fetching quote";
-        console.log("error...", error);
         toast.error(errorMessage);
       }
     },

@@ -39,9 +39,6 @@ export async function signIn(values: signinInputs) {
 
         const ethWallet = await getWallet("ethereum", 1, mnemonic) as Wallet
 
-
-        console.log("fhukitoieru", solanaKeypair, ethWallet)
-
         if (account.solPublicKey) {
 
             if (account.solPublicKey !== solanaKeypair.publicKey.toBase58()) {

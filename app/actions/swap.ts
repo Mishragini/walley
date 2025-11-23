@@ -71,12 +71,10 @@ function axiosToCurl(url: string, params?: quoteParams | buildTxParams, headers?
 
 
 export async function getQuote({ userAddress, to, from, inputAmount, receiverAddress }: GetQuoteParams) {
-    console.log("amount.......", inputAmount)
     const quoteUrl = baseURL + BUNGEE_QUOTE_URL
     const { chainId: originChainId, token: inputToken } = getChainIdAndToken(from)
     const { chainId: destinationChainId, token: outputToken } = getChainIdAndToken(to)
 
-    console.log("quoteurl....", quoteUrl)
 
     const params = {
         userAddress,
@@ -96,7 +94,6 @@ export async function getQuote({ userAddress, to, from, inputAmount, receiverAdd
         "affiliate": BUNGEE_AFFILIATE!
 
     }
-    console.log("Curl command:", axiosToCurl(quoteUrl, params, headers))
 
     const quoteResponse = await axios.get(quoteUrl, {
         params,
@@ -108,7 +105,6 @@ export async function getQuote({ userAddress, to, from, inputAmount, receiverAdd
         throw new Error("Failed to fetch quote")
     }
 
-    console.log("quoteResponse.data.result", quoteResponse.data.result)
 
     return quoteResponse.data.result;
 }
@@ -124,13 +120,11 @@ export async function buildTx(quoteId: string) {
     const params = {
         quoteId
     }
-    console.log("Curl command:", axiosToCurl(buildTxUrl, params, headers))
 
     const buildTxResponse = await axios.get(buildTxUrl, {
         params, headers
     })
 
-    console.log("buildTxResponse", buildTxResponse)
 
     if (!buildTxResponse || !buildTxResponse.data || !buildTxResponse.data.success) {
         throw new Error("Build Transaction failed.")
